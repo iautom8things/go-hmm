@@ -11,6 +11,13 @@ type SortedMap struct {
 	s []string
 }
 
+func CreateSortedMap() SortedMap {
+	sm := SortedMap{}
+	sm.m = make(map[string]float64)
+	sm.s = make([]string, 0)
+	return sm
+}
+
 func (sm *SortedMap) Has(key string) bool {
 	_, ok := sm.m[key]
 	return ok
