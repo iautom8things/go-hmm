@@ -3,7 +3,6 @@ package markov
 import (
 	"errors"
 	"git.bigodev.com/mazubieta/go-hmm/collections"
-	"math/Rand"
 )
 
 type State struct {
@@ -46,11 +45,44 @@ func (s State) getEmitionProbability(symbol string) (float64, error) {
 	return relProb / totalProb, nil
 }
 
-func (s State) getRandomEmition() (float64, error) {
-	r := rand.Float64()
-	r += 1
-	totalProb := s.emitions.Total()
-	totalProb += 1
+func (s State) getRandomEmition() (string, error) {
+	return s.emitions.GetRandom()
+}
 
-	return 0.0, nil
+func (s *State) addNeighbor(state string, rel_prob float64) error {
+	// check if we already have emition
+	found := s.neighbors.Has(state)
+	if !found {
+		return errors.New("neighbor already exists")
+	}
+
+	s.neighbors.Add(state, rel_prob)
+	return nil
+}
+
+func (s State) removeNeighbor(state string) error {
+	// check if we have emition
+	found := s.neighbors.Has(state)
+	if !found {
+		return errors.New("neihbor does not exist")
+	}
+
+	s.neighbors.Remove(state)
+	return nil
+}
+
+func (s State) getTransitionProbability(state string) (float64, error) {
+	// check if we have emition
+	found := s.neighbors.Has(state)
+	if !found {
+		return 0.0, errors.New("transition does not exist")
+	}
+
+	totalProb := s.neighbors.Total()
+	relProb, _ := s.neighbors.Get(state)
+	return relProb / totalProb, nil
+}
+
+func (s State) getRandomTransition() (string, error) {
+	return s.neighbors.GetRandom()
 }
