@@ -71,7 +71,7 @@ func (sm *SortedMap) GetRandom() (string, error) {
 	r := rand.Float64()
 	acc := 0.0
 	for _, s := range sm.s {
-		acc = sm.m[s] / totalProb
+		acc += sm.m[s] / totalProb
 		if acc > r {
 			return s, nil
 		}
