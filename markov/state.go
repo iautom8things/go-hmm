@@ -11,29 +11,35 @@ type State struct {
 	emitions  collections.SortedMap
 }
 
-func (s *State) addEmition(symbol string, rel_prob float64) error {
-	// check if we already have emition
+func CreateState(name string) State {
+	state := State{Name: name}
+	state.neighbors = collections.CreateSortedMap()
+	state.emitions = collections.CreateSortedMap()
+	return state
+}
+
+func (s *State) AddEmition(symbol string, relProb float64) error {
 	found := s.emitions.Has(symbol)
-	if !found {
-		return errors.New("State: Emition already seen")
+	if found {
+		return errors.New("Emition already seen")
 	}
 
-	s.emitions.Add(symbol, rel_prob)
+	s.emitions.Add(symbol, relProb)
 	return nil
 }
 
-func (s State) removeEmition(symbol string) error {
+func (s *State) RemoveEmition(symbol string) error {
 	// check if we have emition
 	found := s.emitions.Has(symbol)
 	if !found {
-		return errors.New("State: Emition does not exist")
+		return errors.New("Emition does not exist")
 	}
 
 	s.emitions.Remove(symbol)
 	return nil
 }
 
-func (s State) getEmitionProbability(symbol string) (float64, error) {
+func (s *State) GetEmitionProbability(symbol string) (float64, error) {
 	// check if we have emition
 	found := s.emitions.Has(symbol)
 	if !found {
@@ -45,22 +51,22 @@ func (s State) getEmitionProbability(symbol string) (float64, error) {
 	return relProb / totalProb, nil
 }
 
-func (s State) getRandomEmition() (string, error) {
-	return s.emitions.GetRandom()
+func (s *State) GetRandomEmition() (string, error) {
+	e, err := s.emitions.GetRandom()
+	return e, err
 }
 
-func (s *State) addNeighbor(state string, rel_prob float64) error {
-	// check if we already have emition
+func (s *State) AddNeighbor(state string, relProb float64) error {
 	found := s.neighbors.Has(state)
-	if !found {
+	if found {
 		return errors.New("neighbor already exists")
 	}
 
-	s.neighbors.Add(state, rel_prob)
+	s.neighbors.Add(state, relProb)
 	return nil
 }
 
-func (s State) removeNeighbor(state string) error {
+func (s *State) RemoveNeighbor(state string) error {
 	// check if we have emition
 	found := s.neighbors.Has(state)
 	if !found {
@@ -71,7 +77,7 @@ func (s State) removeNeighbor(state string) error {
 	return nil
 }
 
-func (s State) getTransitionProbability(state string) (float64, error) {
+func (s *State) GetTransitionProbability(state string) (float64, error) {
 	// check if we have emition
 	found := s.neighbors.Has(state)
 	if !found {
@@ -83,6 +89,7 @@ func (s State) getTransitionProbability(state string) (float64, error) {
 	return relProb / totalProb, nil
 }
 
-func (s State) getRandomTransition() (string, error) {
-	return s.neighbors.GetRandom()
+func (s *State) GetRandomTransition() (string, error) {
+	t, err := s.neighbors.GetRandom()
+	return t, err
 }
