@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"git.bigodev.com/mazubieta/go-hmm/markov"
 	"io"
 	"io/ioutil"
 	"log"
@@ -53,6 +54,7 @@ func main() {
 	// seed PRNG
 	rand.Seed(seed)
 	var inf = math.Inf(1)
+	s := markov.State{Name: "harold"}
 
-	fmt.Println("hi", inf)
+	fmt.Println("hi", inf, s.Name)
 }
