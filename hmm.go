@@ -49,13 +49,13 @@ func main() {
 	unfair.AddNeighbor("u", 1.0-transProb)
 
 	// lookup map of states
-	states := map[string]markov.State{"f": fair, "u": unfair}
+	states := map[string]*markov.State{"f": &fair, "u": &unfair}
 
 	// randomly start at a state (assumed equal probability of start state)
 	ridx := rand.Intn(len(states))
 	i := 0
 
-	var currentState markov.State
+	var currentState *markov.State
 	for _, state := range states {
 		if ridx == i {
 			currentState = state
