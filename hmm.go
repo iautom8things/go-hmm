@@ -60,7 +60,7 @@ func main() {
 	var emitionBuffer, stateBuffer, fileBuffer bytes.Buffer
 
 	for i := 0; i < numIter; i++ {
-		e, s, err2 := model.TakeStep()
+		s, e, err2 := model.TakeStep()
 		if err2 != nil {
 			panic(err2)
 		}
