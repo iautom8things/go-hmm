@@ -20,7 +20,7 @@ func main() {
 	flag.Int64Var(&seed, "s", time.Now().Unix(), "Seed for PRNG (Default: time.Time())")
 	flag.IntVar(&numIter, "n", 1000, "Number of Time Steps (Default: 1000)")
 	flag.Float64Var(&transProb, "t", 0.1, "Transition Porbability (Default: 0.1)")
-	flag.StringVar(&outputFile, "0", "output_hmm", "Output file name(Default: \"output_hmm\")")
+	flag.StringVar(&outputFile, "o", "output_hmm", "Output file name(Default: \"output_hmm\")")
 	flag.Parse()
 
 	// seed PRNG
@@ -74,11 +74,14 @@ func main() {
 		currentState = states[nextState]
 	}
 
+	fileBuffer.WriteString(strconv.FormatInt(seed, 10))
+	fileBuffer.WriteString(",")
 	fileBuffer.WriteString(strconv.FormatFloat(transProb, 'f', 6, 64))
 	fileBuffer.WriteString(",")
 	fileBuffer.WriteString(emitionBuffer.String())
 	fileBuffer.WriteString(",")
 	fileBuffer.WriteString(stateBuffer.String())
+	fileBuffer.WriteString("\n")
 
 	ioutil.WriteFile(outputFile, fileBuffer.Bytes(), 0644)
 }
