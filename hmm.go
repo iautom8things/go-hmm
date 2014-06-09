@@ -49,29 +49,23 @@ func main() {
 	unfair.AddNeighbor("u", 1.0-transProb)
 
 	// lookup map of states
-	states := map[string]*markov.State{"f": &fair, "u": &unfair}
-
-	// randomly start at a state (assumed equal probability of start state)
-	ridx := rand.Intn(len(states))
-	i := 0
-
-	var currentState *markov.State
-	for _, state := range states {
-		if ridx == i {
-			currentState = state
-			break
-		}
-		i++
+	model := markov.Model{
+		States: []*markov.State{&fair, &unfair},
+	}
+	err := model.Initialize()
+	if err != nil {
+		panic(err)
 	}
 
 	var emitionBuffer, stateBuffer, fileBuffer bytes.Buffer
 
 	for i := 0; i < numIter; i++ {
-		e, _ := currentState.GetRandomEmition()
+		e, s, err2 := model.TakeStep()
+		if err2 != nil {
+			panic(err2)
+		}
 		emitionBuffer.WriteString(e)
-		stateBuffer.WriteString(currentState.Name)
-		nextState, _ := currentState.GetRandomTransition()
-		currentState = states[nextState]
+		stateBuffer.WriteString(s)
 	}
 
 	fileBuffer.WriteString(strconv.FormatInt(seed, 10))
