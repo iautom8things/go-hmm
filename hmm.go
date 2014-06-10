@@ -66,11 +66,17 @@ func main() {
 		}
 		emitionBuffer.WriteString(e)
 		stateBuffer.WriteString(s)
+		if (i + 1) < numIter {
+			emitionBuffer.WriteString(",")
+			stateBuffer.WriteString(",")
+		}
 	}
 
 	fileBuffer.WriteString(strconv.FormatInt(seed, 10))
 	fileBuffer.WriteString(",")
 	fileBuffer.WriteString(strconv.FormatFloat(transProb, 'f', 6, 64))
+	fileBuffer.WriteString(",")
+	fileBuffer.WriteString(strconv.FormatInt(int64(numIter), 10))
 	fileBuffer.WriteString(",")
 	fileBuffer.WriteString(emitionBuffer.String())
 	fileBuffer.WriteString(",")
