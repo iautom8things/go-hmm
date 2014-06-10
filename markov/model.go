@@ -6,10 +6,10 @@ import (
 )
 
 type Model struct {
+	CurrentState *State
 	States       []*State
 	stateLookup  map[string]*State
 	initialProbs collections.SortedMap
-	currentState *State
 }
 
 func (m *Model) Initialize() error {
@@ -40,25 +40,34 @@ func (m *Model) Initialize() error {
 		return errors.New("state not found")
 	}
 
-	m.currentState = rState
+	m.CurrentState = rState
 
 	return nil
 }
 
 func (m *Model) TakeStep() (string, string, error) {
-	currentStateName := m.currentState.Name
-	emition, err1 := m.currentState.GetRandomEmition()
+	currentStateName := m.CurrentState.Name
+	emition, err1 := m.CurrentState.GetRandomEmition()
 
 	if err1 != nil {
 		return "", "", err1
 	}
 
-	nextState, err2 := m.currentState.GetRandomTransition()
+	nextState, err2 := m.CurrentState.GetRandomTransition()
 
 	if err2 != nil {
 		return "", "", err2
 	}
 
-	m.currentState = m.stateLookup[nextState]
+	m.CurrentState = m.stateLookup[nextState]
 	return currentStateName, emition, nil
+}
+
+func (m *Model) GetInitialProb(s string) float64 {
+	p, _ := m.initialProbs.GetProbabilityOf(s)
+	return p
+}
+
+func (m *Model) GetState(s string) *State {
+	return m.stateLookup[s]
 }
