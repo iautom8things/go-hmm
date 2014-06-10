@@ -1,11 +1,12 @@
 package main
 
 import (
-	/*"bytes"*/
+	"bytes"
 	"encoding/csv"
 	"flag"
 	"fmt"
 	"git.bigodev.com/mazubieta/go-hmm/markov"
+	"io/ioutil"
 	"os"
 	"strconv"
 )
@@ -14,8 +15,8 @@ func main() {
 	var inputFile, outputFile string
 
 	// set flags for simulation
-	flag.StringVar(&inputFile, "i", "output_hmm", "Output file name(Default: \"output_hmm\")")
-	flag.StringVar(&outputFile, "o", "output_hmm", "Output file name(Default: \"output_hmm\")")
+	flag.StringVar(&inputFile, "i", "output_hmm", "Output file name")
+	flag.StringVar(&outputFile, "o", "output_decode", "Output file name")
 	flag.Parse()
 
 	// create fair die
@@ -80,31 +81,29 @@ func main() {
 		hiddenStates[i] = line[3+numObservations : 3+2*numObservations]
 	}
 
-	n := int(numObservations)
+	var fileBuffer bytes.Buffer
 
 	for i := 0; i < nRecords; i++ {
 		observation := observations[i]
 		states := hiddenStates[i]
+
+		// update transition probabilities
 		fair.EditNeighbor("f", 1.0-tprobs[i])
 		fair.EditNeighbor("u", tprobs[i])
 		unfair.EditNeighbor("f", tprobs[i])
 		unfair.EditNeighbor("u", 1.0-tprobs[i])
 
-		if len(observation) != len(states) {
-			fmt.Println("Mismatch record [", i, "] ...skipping...")
-			continue
-		}
-
-		// decode via Viterbi
+		// decode
 		pi_v := viterbi.Decode(observation)
 		pi_p := posterior.Decode(observation)
 
-		/*var stateBuffer, piBuffer bytes.Buffer*/
-		correct_v := 0.0
-		correct_p := 0.0
-		for j := 0; j < n; j++ {
-			/*piBuffer.WriteString(pi[j])*/
-			/*stateBuffer.WriteString(states[j])*/
+		var stateBuffer, piVBuffer, piPBuffer bytes.Buffer
+		correct_v := 0
+		correct_p := 0
+		for j := 0; j < int(numObservations); j++ {
+			piVBuffer.WriteString(pi_v[j])
+			piPBuffer.WriteString(pi_p[j])
+			stateBuffer.WriteString(states[j])
 			if pi_v[j] == states[j] {
 				correct_v++
 			}
@@ -112,9 +111,21 @@ func main() {
 				correct_p++
 			}
 		}
-		/*fmt.Println(stateBuffer.String())*/
-		/*fmt.Println(piBuffer.String())*/
-		fmt.Println(tprobs[i], n, correct_v, correct_v/float64(n), "||", correct_p, correct_p/float64(n))
+		fmt.Println(tprobs[i],
+			numObservations,
+			float64(correct_v),
+			float64(correct_v)/float64(numObservations),
+			"||",
+			float64(correct_p),
+			float64(correct_p)/float64(numObservations))
+
+		fileBuffer.WriteString(strconv.FormatFloat(tprobs[i], 'f', 6, 64))
+		fileBuffer.WriteString(",")
+		fileBuffer.WriteString(strconv.FormatInt(int64(correct_v), 10))
+		fileBuffer.WriteString(",")
+		fileBuffer.WriteString(strconv.FormatInt(int64(correct_p), 10))
+		fileBuffer.WriteString("\n")
 
 	}
+	ioutil.WriteFile(outputFile, fileBuffer.Bytes(), 0644)
 }

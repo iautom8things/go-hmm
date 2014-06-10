@@ -53,9 +53,9 @@ func (p *Posterior) Decode(observations []string) []string {
 			maxIProb := math.Inf(-1)
 			for _, state_i := range p.States {
 				v_i := vProb[state_i.Name][j+1]
-				trans_i2j_prob, _ := state_i.GetTransitionProbability(state_j.Name)
+				trans_j2i_prob, _ := state_j.GetTransitionProbability(state_i.Name)
 
-				mul := math.Exp(math.Log(v_i) + math.Log(trans_i2j_prob))
+				mul := math.Exp(math.Log(v_i) + math.Log(trans_j2i_prob))
 
 				if mul > maxIProb {
 					maxIProb = mul
