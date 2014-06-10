@@ -152,11 +152,14 @@ func main() {
 		for _, s := range model.States {
 			INFO.Println("working on initial state: ", s.Name)
 			v[s.Name] = make([]float64, len(observation))
-			e, _ := s.GetEmitionProbability(string(observation[0]))
+			e, err := s.GetEmitionProbability(string(observation[0]))
+			if err != nil {
+				panic(err)
+			}
 			t := model.GetInitialProb(s.Name)
-			v_j := e * t
+			v_j := math.Exp(math.Log(e) + math.Log(t))
 			v[s.Name][0] = v_j
-			INFO.Println(s.Name, e, t, v[s.Name][0])
+			INFO.Println("state:", s.Name, "e_prob:", e, "t_prob:", t, "prev_prob:", v[s.Name][0])
 			if v_j > max_val {
 				max_val = v_j
 				max_state = s.Name
@@ -164,29 +167,49 @@ func main() {
 		}
 		pi[0] = max_state
 
+		INFO.Println("ITER OVER OBS")
 		for j := 1; j < len(observation); j++ {
 			obs_j := string(observation[j])
-			var max_state string
-			max_val := math.Inf(-1)
+			INFO.Println("obs: <", obs_j, ">")
+
+			var max_j_state string
+			max_j_val := math.Inf(-1)
 			for _, state_j := range model.States {
+				INFO.Println("Trying to beat maxes: ", max_j_state, "v:", max_j_val)
 				e_j, _ := state_j.GetEmitionProbability(obs_j)
-				vi_sum := 0.0
+
+				WARNING.Println("state: <", state_j.Name, "> emit_p: ", e_j)
+
+				max_i_val := math.Inf(-1)
 				for _, state_i := range model.States {
 					v_prev := v[state_i.Name][j-1]
-					t_prob, _ := state_i.GetTransitionProbability(obs_j)
-					vi_sum += v_prev * t_prob
+					t_prob, _ := state_i.GetTransitionProbability(state_j.Name)
+
+					mul := math.Exp(math.Log(v_prev) + math.Log(t_prob))
+
+					INFO.Println("State: ", state_i.Name, " v_prev: ", v_prev, "t_prob:", t_prob, "mul: ", mul)
+
+					if mul > max_i_val {
+						max_i_val = mul
+					}
 				}
-				v_j := e_j * vi_sum
+
+				v_j := math.Exp(math.Log(e_j) + max_i_val)
+
+				WARNING.Println("See if we beat maxes with: v_j: <", v_j)
+
 				v[state_j.Name][j] = v_j
-				if v_j > max_val {
-					max_val = v_j
-					max_state = state_j.Name
+				if v_j > max_j_val {
+					INFO.Println("OLD: ", max_j_state, "v:", max_j_val)
+					max_j_val = v_j
+					max_j_state = state_j.Name
 				}
 			}
-			pi[j] = max_state
+			pi[j] = max_j_state
 		}
 
-		fmt.Print(pi)
+		fmt.Println(states)
+		fmt.Println(pi)
 
 	}
 }
