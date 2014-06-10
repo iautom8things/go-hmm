@@ -6,28 +6,17 @@ import (
 	"flag"
 	"fmt"
 	"git.bigodev.com/mazubieta/go-hmm/markov"
-	"math/Rand"
 	"os"
 	"strconv"
-	"time"
 )
 
 func main() {
-	var seed int64
-	var numIter int
-	var transProb float64
 	var inputFile, outputFile string
 
 	// set flags for simulation
-	flag.Int64Var(&seed, "s", time.Now().Unix(), "Seed for PRNG (Default: time.Time())")
-	flag.IntVar(&numIter, "n", 1000, "Number of Time Steps (Default: 1000)")
-	flag.Float64Var(&transProb, "t", 0.1, "Transition Porbability (Default: 0.1)")
 	flag.StringVar(&inputFile, "i", "output_hmm", "Output file name(Default: \"output_hmm\")")
 	flag.StringVar(&outputFile, "o", "output_hmm", "Output file name(Default: \"output_hmm\")")
 	flag.Parse()
-
-	// seed PRNG
-	rand.Seed(seed)
 
 	// create fair die
 	fair := markov.CreateState("f")
@@ -37,8 +26,8 @@ func main() {
 	fair.AddEmition("4", 1.0)
 	fair.AddEmition("5", 1.0)
 	fair.AddEmition("6", 1.0)
-	fair.AddNeighbor("f", 1.0-transProb)
-	fair.AddNeighbor("u", transProb)
+	fair.AddNeighbor("f", 0.5)
+	fair.AddNeighbor("u", 0.5)
 
 	// craete unfair die
 	unfair := markov.CreateState("u")
@@ -48,15 +37,19 @@ func main() {
 	unfair.AddEmition("4", 1.0)
 	unfair.AddEmition("5", 1.0)
 	unfair.AddEmition("6", 5.0)
-	unfair.AddNeighbor("f", transProb)
-	unfair.AddNeighbor("u", 1.0-transProb)
+	unfair.AddNeighbor("f", 0.5)
+	unfair.AddNeighbor("u", 0.5)
 
 	// lookup map of states
 	viterbi := markov.Viterbi{
 		markov.Model{States: []*markov.State{&fair, &unfair}},
 	}
+	posterior := markov.Posterior{
+		markov.Model{States: []*markov.State{&fair, &unfair}},
+	}
 
 	viterbi.Initialize()
+	posterior.Initialize()
 
 	// read csv file of all tests
 	file, err := os.Open(inputFile)
@@ -103,20 +96,25 @@ func main() {
 		}
 
 		// decode via Viterbi
-		pi := viterbi.Decode(observation)
+		pi_v := viterbi.Decode(observation)
+		pi_p := posterior.Decode(observation)
 
 		/*var stateBuffer, piBuffer bytes.Buffer*/
-		correct := 0.0
+		correct_v := 0.0
+		correct_p := 0.0
 		for j := 0; j < n; j++ {
 			/*piBuffer.WriteString(pi[j])*/
 			/*stateBuffer.WriteString(states[j])*/
-			if pi[j] == states[j] {
-				correct++
+			if pi_v[j] == states[j] {
+				correct_v++
+			}
+			if pi_p[j] == states[j] {
+				correct_p++
 			}
 		}
 		/*fmt.Println(stateBuffer.String())*/
 		/*fmt.Println(piBuffer.String())*/
-		fmt.Println(tprobs[i], correct, n, correct/float64(n))
+		fmt.Println(tprobs[i], n, correct_v, correct_v/float64(n), "||", correct_p, correct_p/float64(n))
 
 	}
 }
