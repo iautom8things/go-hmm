@@ -53,13 +53,14 @@ func (sm *SortedMap) Remove(key string) error {
 	return nil
 }
 
-func (sm *SortedMap) Get(key string) (float64, error) {
+func (sm *SortedMap) GetProbabilityOf(key string) (float64, error) {
+
 	found := sm.Has(key)
 	if !found {
 		return 0.0, errors.New("key not found")
 	}
 
-	return sm.m[key], nil
+	return sm.m[key] / sm.Total(), nil
 }
 
 func (sm *SortedMap) GetRandom() (string, error) {

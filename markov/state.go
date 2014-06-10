@@ -46,9 +46,8 @@ func (s *State) GetEmitionProbability(symbol string) (float64, error) {
 		return 0.0, errors.New("State: Emition does not exist")
 	}
 
-	totalProb := s.emitions.Total()
-	relProb, _ := s.emitions.Get(symbol)
-	return relProb / totalProb, nil
+	p, _ := s.emitions.GetProbabilityOf(symbol)
+	return p, nil
 }
 
 func (s *State) GetRandomEmition() (string, error) {
@@ -84,9 +83,8 @@ func (s *State) GetTransitionProbability(state string) (float64, error) {
 		return 0.0, errors.New("transition does not exist")
 	}
 
-	totalProb := s.neighbors.Total()
-	relProb, _ := s.neighbors.Get(state)
-	return relProb / totalProb, nil
+	p, _ := s.neighbors.GetProbabilityOf(state)
+	return p, nil
 }
 
 func (s *State) GetRandomTransition() (string, error) {
