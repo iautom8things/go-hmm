@@ -1,0 +1,51 @@
+I appear to be having an issue with the posterior calculations.  I am getting virtually the same results forward or backwards.
+There are two scripts that I used for generating the data files, they can be found in /misc.
+
+
+/go-hmm
+  /data
+    -> combined.csv -- the generated observations from the HMM
+    -> decoded.csv  -- the results of running the combined.csv file through the decode binary
+  /misc
+    -> combine_results.sh
+    -> do_tests.py
+  decode            -- binary to run viterbi and posterior decoding
+  hmm               -- binary to run observation generation of unfair casino
+
+Resultes:
+
+tprob,viterbi_nsuccess,posterior_nsuccess
+0.001000,0.572,0.572
+0.011474,0.611,0.610
+0.105737,0.680,0.680
+0.116211,0.684,0.683
+0.126684,0.672,0.672
+0.137158,0.670,0.669
+0.147632,0.645,0.644
+0.158105,0.668,0.667
+0.168579,0.674,0.673
+0.179053,0.683,0.683
+0.189526,0.654,0.653
+0.200000,0.674,0.673
+0.021947,0.723,0.722
+0.032421,0.673,0.672
+0.042895,0.681,0.680
+0.053368,0.698,0.697
+0.063842,0.677,0.677
+0.074316,0.679,0.679
+0.084789,0.652,0.651
+0.095263,0.629,0.628
+
+Homework Description:
+
+As a late add -- this is what I have copied down as the project assignment:
+The ultimate goal of this assignment is twofold: to have you code a Hidden Markov Model, and to use it (and posterior decoding) to learn something about the strengths/weaknesses of posterior decoding vs. Viterbi decoding.  We'll use the dishonest casino model, and treat the probability of transitioning to a dishonest die as a variable.
+Write a class for a Hidden Markov Model that is as general as possible.  States should have properties that represent probabilities for the emission of symbols, transitions to other states, and the model should have the possibility of begin and end states. (NOTE: the dishonest casino does not have these states, but an HMM IN GENERAL might have them, so give your class that capability).  Use this model in a generative fashion to simulate the "sometimes dishonest casino" described in your text.  Let's treat the probability of transitioning to a dishonest die as a variable, and generate, say, 20 sequences of length 1000, for different probabilities of that transition (say, starting from 0.001 to 0.2).  You'll need to code up the decoding processes, and compare the performance (decoded state vs. actual state) for posterior vs. Viterbi decoding, and discuss your results.  Does one work better for highly probable transitions?  Highly improbable transitions?  Discuss this in your results.
+This is not a trivial assignment, so it will be worth twice as much as there previous assignments (200 points)
+We can discuss in class on Tuesday if you have any questions.
+
+Notes:
+
+I'm not sure if by Posterior you meant the Baum-Welch algorithm?
+Viterbi definitely seems better when the model is less likely to transition from one state to another.
+
