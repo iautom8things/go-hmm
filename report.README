@@ -1,16 +1,27 @@
 I appear to be having an issue with the posterior calculations.  I am getting virtually the same results forward or backwards.
-There are two scripts that I used for generating the data files, they can be found in /misc.
+There are two scripts that I used for help with generating the data files, they can be found in /misc.
 
+Directory structure: 
 
 /go-hmm
+  /collections
+    -> sortedmap.go -- used for storing neighbor/emition probability distributions
   /data
     -> combined.csv -- the generated observations from the HMM
     -> decoded.csv  -- the results of running the combined.csv file through the decode binary
+  /markov
+    -> model.go     -- generic model of a markov model used for generation and decoding
+    -> viterbi.go   -- viterbi decoder
+    -> posterior.go -- posterior decoder
+    -> state.go     -- states that a model is made up of
   /misc
     -> combine_results.sh
-    -> do_tests.py
+                    -- used to combine several files together
+    -> do_tests.py  -- used to run the evenly spaced tests from 0.001 - 0.2 for transition probability
   decode            -- binary to run viterbi and posterior decoding
+  decode.go         -- src file for binary
   hmm               -- binary to run observation generation of unfair casino
+  hmm.go            -- src file for binary
 
 Resultes:
 
