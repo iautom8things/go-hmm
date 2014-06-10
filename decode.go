@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	/*"bytes"*/
 	"encoding/csv"
 	"flag"
 	"fmt"
@@ -89,7 +89,7 @@ func main() {
 
 	n := int(numObservations)
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < nRecords; i++ {
 		observation := observations[i]
 		states := hiddenStates[i]
 		fair.EditNeighbor("f", 1.0-tprobs[i])
@@ -105,13 +105,18 @@ func main() {
 		// decode via Viterbi
 		pi := viterbi.Decode(observation)
 
-		var stateBuffer, piBuffer bytes.Buffer
+		/*var stateBuffer, piBuffer bytes.Buffer*/
+		correct := 0.0
 		for j := 0; j < n; j++ {
-			piBuffer.WriteString(pi[j])
-			stateBuffer.WriteString(states[j])
+			/*piBuffer.WriteString(pi[j])*/
+			/*stateBuffer.WriteString(states[j])*/
+			if pi[j] == states[j] {
+				correct++
+			}
 		}
-		fmt.Println(stateBuffer.String())
-		fmt.Println(piBuffer.String())
+		/*fmt.Println(stateBuffer.String())*/
+		/*fmt.Println(piBuffer.String())*/
+		fmt.Println(tprobs[i], correct, n, correct/float64(n))
 
 	}
 }
