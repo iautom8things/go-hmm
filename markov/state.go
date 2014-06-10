@@ -65,6 +65,16 @@ func (s *State) AddNeighbor(state string, relProb float64) error {
 	return nil
 }
 
+func (s *State) EditNeighbor(state string, relProb float64) error {
+	found := s.neighbors.Has(state)
+	if !found {
+		return errors.New("neighbor does not exist")
+	}
+
+	s.neighbors.Add(state, relProb)
+	return nil
+}
+
 func (s *State) RemoveNeighbor(state string) error {
 	// check if we have emition
 	found := s.neighbors.Has(state)

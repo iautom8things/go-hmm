@@ -36,6 +36,17 @@ func (sm *SortedMap) Add(key string, value float64) error {
 	return nil
 }
 
+func (sm *SortedMap) Edit(key string, value float64) error {
+	found := sm.Has(key)
+	if !found {
+		return errors.New("key not found")
+	}
+
+	sm.m[key] = value
+	sort.Strings(sm.s)
+	return nil
+}
+
 func (sm *SortedMap) Remove(key string) error {
 	found := sm.Has(key)
 	if !found {
