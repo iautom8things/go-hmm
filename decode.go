@@ -81,7 +81,7 @@ func main() {
 	unfair.AddEmition("3", 1.0)
 	unfair.AddEmition("4", 1.0)
 	unfair.AddEmition("5", 1.0)
-	unfair.AddEmition("6", 2.0)
+	unfair.AddEmition("6", 5.0)
 	unfair.AddNeighbor("f", transProb)
 	unfair.AddNeighbor("u", 1.0-transProb)
 
@@ -136,6 +136,7 @@ func main() {
 
 	for i := 0; i < 1; i++ {
 		observation := observations[i]
+		INFO.Println("workong on observation: ", observation)
 		states := hiddenStates[i]
 
 		if len(observation) != len(states) {
@@ -149,12 +150,13 @@ func main() {
 		var max_state string
 		max_val := math.Inf(-1)
 		for _, s := range model.States {
+			INFO.Println("working on initial state: ", s.Name)
 			v[s.Name] = make([]float64, len(observation))
 			e, _ := s.GetEmitionProbability(string(observation[0]))
 			t := model.GetInitialProb(s.Name)
 			v_j := e * t
 			v[s.Name][0] = v_j
-			fmt.Println(s.Name, e, t, v[s.Name][0])
+			INFO.Println(s.Name, e, t, v[s.Name][0])
 			if v_j > max_val {
 				max_val = v_j
 				max_state = s.Name

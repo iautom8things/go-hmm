@@ -44,7 +44,7 @@ func main() {
 	unfair.AddEmition("3", 1.0)
 	unfair.AddEmition("4", 1.0)
 	unfair.AddEmition("5", 1.0)
-	unfair.AddEmition("6", 2.0)
+	unfair.AddEmition("6", 5.0)
 	unfair.AddNeighbor("f", transProb)
 	unfair.AddNeighbor("u", 1.0-transProb)
 
